@@ -12,7 +12,7 @@ body {
 }
 
 /* =========================
-   FOND RADIAL ROSE
+   FOND RADIAL ROSE (ROBUSTE)
 ========================= */
 
 body::before {
@@ -33,11 +33,13 @@ body::before {
   transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
+/* apparition du rose */
 body.special-bg::before {
   transform: scale(1.8);
   opacity: 1;
 }
 
+/* retour au gris */
 body.reset-bg::before {
   transform: scale(0);
   opacity: 0;
@@ -52,8 +54,6 @@ body.reset-bg::before {
   width: 100%;
   height: 100%;
   touch-action: manipulation;
-
-  perspective: 1200px;
 }
 
 /* =========================
@@ -71,12 +71,8 @@ body.reset-bg::before {
 
   transform: translate(-50%, -50%);
   transform-style: preserve-3d;
-  transform-origin: center center;
 
   transition: transform 0.5s ease, opacity 0.4s ease;
-
-  will-change: transform;
-  backface-visibility: hidden;
 }
 
 /* micro-feedback tap */
@@ -98,9 +94,6 @@ body.reset-bg::before {
   background-position: center;
 
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-
-  transform-style: preserve-3d;
 }
 
 .card-back {
@@ -112,7 +105,7 @@ body.reset-bg::before {
 }
 
 /* =========================
-   PILE
+   PILE (5 CARTES)
 ========================= */
 
 .card.active {
@@ -126,7 +119,7 @@ body.reset-bg::before {
 .card.stack-4 { z-index: 1; }
 
 /* =========================
-   FLIP
+   FLIP SIMPLE (STABLE)
 ========================= */
 
 .card.flipped {
