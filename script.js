@@ -2,7 +2,7 @@ const game = document.getElementById("game");
 const body = document.body;
 
 /* =========================
-   DOS
+   DOS DES CARTES
 ========================= */
 
 const DOS = {
@@ -17,33 +17,40 @@ const DOS = {
 
 function randomRotation() {
   const sign = Math.random() < 0.5 ? -1 : 1;
-  const value = Math.random() * 5 + 3; // 3 → 8
+  const value = Math.random() * 5 + 3; // entre 3 et 8
   return +(sign * value).toFixed(2);
 }
 
 function creerCarte(data) {
-  return { ...data, rotation: randomRotation() };
+  return {
+    ...data,
+    rotation: randomRotation()
+  };
 }
 
 /* =========================
    CARTES
 ========================= */
 
+// cartes chiffres
 const chiffres = [];
 const couleurs = ["vert", "orange"];
 
 for (let couleur of couleurs) {
   for (let i = 0; i <= 9; i++) {
     for (let k = 0; k < 4; k++) {
-      chiffres.push(creerCarte({
-        type: "chiffre",
-        image: `assets/cartes/chiffres/chiffre-${i}-${couleur}.png`,
-        dos: DOS.chiffre
-      }));
+      chiffres.push(
+        creerCarte({
+          type: "chiffre",
+          image: `assets/cartes/chiffres/chiffre-${i}-${couleur}.png`,
+          dos: DOS.chiffre
+        })
+      );
     }
   }
 }
 
+// cartes spéciales (ATTENTION : tourneegenerale)
 const cartesSpeciales = [
   "mytho",
   "doubledose",
@@ -67,6 +74,7 @@ const cartesSpeciales = [
   })
 );
 
+// cartes règles
 const cartesRegles = ["1", "2", "3", "4"].map(id => ({
   type: "regle",
   image: `assets/cartes/regles/regle-${id}.png`,
@@ -82,8 +90,12 @@ let piocheInitiale = [...cartesRegles];
 const piochePrincipale = [...chiffres, ...cartesSpeciales];
 
 function tirerCarte() {
-  if (piocheInitiale.length > 0) return piocheInitiale.shift();
-  return piochePrincipale[Math.floor(Math.random() * piochePrincipale.length)];
+  if (piocheInitiale.length > 0) {
+    return piocheInitiale.shift();
+  }
+  return piochePrincipale[
+    Math.floor(Math.random() * piochePrincipale.length)
+  ];
 }
 
 /* =========================
@@ -95,7 +107,7 @@ let pile = [];
 let animating = false;
 
 /* =========================
-   INITIALISATION (INTRO)
+   INITIALISATION
 ========================= */
 
 function initPile() {
@@ -103,29 +115,27 @@ function initPile() {
   game.innerHTML = "";
   body.classList.remove("special-bg", "reset-bg");
 
-  // 4 règles
+  // 4 cartes règles
   for (let i = 0; i < 4; i++) {
     pile.push(tirerCarte());
   }
 
-  // 5e carte = chiffre
+  // 5e carte = chiffre obligatoire
   pile.push(chiffres[Math.floor(Math.random() * chiffres.length)]);
 
-  renderPile(true);
+  renderPile();
 }
 
 /* =========================
    RENDU
 ========================= */
 
-function renderPile(isIntro = false) {
+function renderPile() {
   game.innerHTML = "";
 
   pile.forEach((carte, index) => {
     const card = document.createElement("div");
     card.classList.add("card");
-
-    if (isIntro) card.classList.add("intro");
 
     if (index === 0) {
       card.classList.add("active");
@@ -147,14 +157,7 @@ function renderPile(isIntro = false) {
     card.appendChild(front);
     game.appendChild(card);
 
-    // intro : cartes distribuées une à une
-    if (isIntro) {
-      setTimeout(() => {
-        card.classList.remove("intro");
-      }, 150 + index * 150);
-    }
-
-    // flip + fond rose
+    // flip + fond rose si carte spéciale (sauf balleneuve)
     if (index === 0) {
       setTimeout(() => {
         card.classList.add("flipped");
@@ -163,9 +166,10 @@ function renderPile(isIntro = false) {
           carte.type === "speciale" &&
           carte.nom !== "balleneuve"
         ) {
+          body.classList.remove("reset-bg");
           body.classList.add("special-bg");
         }
-      }, isIntro ? 900 : 60);
+      }, 60);
     }
   });
 }
@@ -178,12 +182,14 @@ function tirerEtAnimer() {
   if (animating) return;
   animating = true;
 
-  // retour fond gris
+  // retour au fond gris avant nouvelle carte
   if (body.classList.contains("special-bg")) {
     body.classList.remove("special-bg");
     body.classList.add("reset-bg");
 
-    setTimeout(() => body.classList.remove("reset-bg"), 450);
+    setTimeout(() => {
+      body.classList.remove("reset-bg");
+    }, 450);
   }
 
   const carteActive = document.querySelector(".card.active");
@@ -200,7 +206,6 @@ function tirerEtAnimer() {
     renderPile();
     animating = false;
   }, 450);
-
 }
 
 game.addEventListener("click", tirerEtAnimer);
