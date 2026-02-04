@@ -1,4 +1,5 @@
 const game = document.getElementById("game");
+const body = document.body;
 
 /* =========================
    DOS
@@ -21,10 +22,7 @@ function randomRotation() {
 }
 
 function creerCarte(data) {
-  return {
-    ...data,
-    rotation: randomRotation()
-  };
+  return { ...data, rotation: randomRotation() };
 }
 
 /* =========================
@@ -54,7 +52,7 @@ const cartesSpeciales = [
   "mytho",
   "doubledose",
   "unpetitdernier?",
-  "tourneegenerale",
+  "tournegenerale",
   "pl(s)",
   "visiontrouble",
   "cestlescopains!",
@@ -112,6 +110,7 @@ let animating = false;
 function initPile() {
   pile = [];
   game.innerHTML = "";
+  body.classList.remove("special-bg", "reset-bg");
 
   for (let i = 0; i < 4; i++) {
     pile.push(tirerCarte());
@@ -142,15 +141,6 @@ function renderPile() {
         `translate(-50%, -50%) rotate(${carte.rotation}deg) translateY(${index * 14}px)`;
     }
 
-    // halo spécial (SAUF balle neuve)
-    if (
-      carte.type === "speciale" &&
-      carte.nom !== "balleneuve" &&
-      index === 0
-    ) {
-      card.classList.add("special-halo");
-    }
-
     const back = document.createElement("div");
     back.classList.add("card-face", "card-back");
     back.style.backgroundImage = `url("${carte.dos}")`;
@@ -163,9 +153,19 @@ function renderPile() {
     card.appendChild(front);
     game.appendChild(card);
 
+    // flip simple
     if (index === 0) {
       setTimeout(() => {
         card.classList.add("flipped");
+
+        // fond rose SI carte spéciale ET pas balle neuve
+        if (
+          carte.type === "speciale" &&
+          carte.nom !== "balleneuve"
+        ) {
+          body.classList.remove("reset-bg");
+          body.classList.add("special-bg");
+        }
       }, 60);
     }
   });
@@ -178,6 +178,16 @@ function renderPile() {
 function tirerEtAnimer() {
   if (animating) return;
   animating = true;
+
+  // retour au fond gris AVANT la nouvelle carte
+  if (body.classList.contains("special-bg")) {
+    body.classList.remove("special-bg");
+    body.classList.add("reset-bg");
+
+    setTimeout(() => {
+      body.classList.remove("reset-bg");
+    }, 450);
+  }
 
   const carteActive = document.querySelector(".card.active");
   if (!carteActive) return;
