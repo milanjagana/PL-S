@@ -12,6 +12,55 @@ body {
 }
 
 /* =========================
+   FOND RADIAL (ROSE ⇄ GRIS)
+========================= */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at center,
+    #FF58FF 0%,
+    transparent 0%
+  );
+
+  opacity: 0;
+}
+
+/* arrivée du rose */
+body.special-bg::before {
+  opacity: 1;
+  animation: radialIn 0.45s ease-out forwards;
+}
+
+/* retour au gris */
+body.reset-bg::before {
+  opacity: 1;
+  animation: radialOut 0.45s ease-in forwards;
+}
+
+@keyframes radialIn {
+  from {
+    background: radial-gradient(circle at center, #FF58FF 0%, transparent 0%);
+  }
+  to {
+    background: radial-gradient(circle at center, #FF58FF 150%, transparent 151%);
+  }
+}
+
+@keyframes radialOut {
+  from {
+    background: radial-gradient(circle at center, #FF58FF 150%, transparent 151%);
+  }
+  to {
+    background: radial-gradient(circle at center, #FF58FF 0%, transparent 0%);
+  }
+}
+
+/* =========================
    ZONE DE JEU
 ========================= */
 
@@ -101,39 +150,4 @@ body {
 .card.exit {
   transform: translate(-50%, -50%) translateX(120%) rotate(25deg);
   opacity: 0;
-}
-
-/* =========================
-   HALO ROSE CARTE SPÉCIALE
-========================= */
-
-.card.special-halo::before {
-  content: "";
-  position: absolute;
-  inset: -18px;
-  border-radius: 22px;
-
-  background: radial-gradient(
-    circle,
-    rgba(255, 88, 255, 0.55),
-    rgba(255, 88, 255, 0.35) 40%,
-    transparent 70%
-  );
-
-  filter: blur(8px);
-  opacity: 0;
-  animation: haloIn 0.4s ease-out forwards;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes haloIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
