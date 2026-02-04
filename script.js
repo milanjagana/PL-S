@@ -200,6 +200,7 @@ function tirerEtAnimer() {
     renderPile();
     animating = false;
   }, 450);
+
 }
 
 game.addEventListener("click", tirerEtAnimer);
