@@ -12,12 +12,12 @@ const DOS = {
 };
 
 /* =========================
-   ROTATION
+   ROTATION CONTRÔLÉE
 ========================= */
 
 function randomRotation() {
   const sign = Math.random() < 0.5 ? -1 : 1;
-  const value = Math.random() * 5 + 3;
+  const value = Math.random() * 5 + 3; // entre 3 et 8
   return +(sign * value).toFixed(2);
 }
 
@@ -32,7 +32,7 @@ function creerCarte(data) {
    CARTES
 ========================= */
 
-// chiffres
+// cartes chiffres
 const chiffres = [];
 const couleurs = ["vert", "orange"];
 
@@ -50,7 +50,7 @@ for (let couleur of couleurs) {
   }
 }
 
-// spéciales
+// cartes spéciales (ATTENTION : tourneegenerale)
 const cartesSpeciales = [
   "mytho",
   "doubledose",
@@ -74,7 +74,7 @@ const cartesSpeciales = [
   })
 );
 
-// règles
+// cartes règles
 const cartesRegles = ["1", "2", "3", "4"].map(id => ({
   type: "regle",
   image: `assets/cartes/regles/regle-${id}.png`,
@@ -107,7 +107,7 @@ let pile = [];
 let animating = false;
 
 /* =========================
-   INIT
+   INITIALISATION
 ========================= */
 
 function initPile() {
@@ -115,11 +115,14 @@ function initPile() {
   game.innerHTML = "";
   body.classList.remove("special-bg", "reset-bg");
 
+  // 4 cartes règles
   for (let i = 0; i < 4; i++) {
     pile.push(tirerCarte());
   }
 
+  // 5e carte = chiffre obligatoire
   pile.push(chiffres[Math.floor(Math.random() * chiffres.length)]);
+
   renderPile();
 }
 
@@ -154,6 +157,7 @@ function renderPile() {
     card.appendChild(front);
     game.appendChild(card);
 
+    // flip + fond rose si carte spéciale (sauf balleneuve)
     if (index === 0) {
       setTimeout(() => {
         card.classList.add("flipped");
@@ -178,6 +182,7 @@ function tirerEtAnimer() {
   if (animating) return;
   animating = true;
 
+  // retour au fond gris avant nouvelle carte
   if (body.classList.contains("special-bg")) {
     body.classList.remove("special-bg");
     body.classList.add("reset-bg");
