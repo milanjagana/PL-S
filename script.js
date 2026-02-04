@@ -2,7 +2,7 @@ const game = document.getElementById("game");
 const body = document.body;
 
 /* =========================
-   DOS
+   DOS DES CARTES
 ========================= */
 
 const DOS = {
@@ -17,19 +17,22 @@ const DOS = {
 
 function randomRotation() {
   const sign = Math.random() < 0.5 ? -1 : 1;
-  const value = Math.random() * 5 + 3; // 3 → 8
+  const value = Math.random() * 5 + 3; // entre 3 et 8
   return +(sign * value).toFixed(2);
 }
 
 function creerCarte(data) {
-  return { ...data, rotation: randomRotation() };
+  return {
+    ...data,
+    rotation: randomRotation()
+  };
 }
 
 /* =========================
    CARTES
 ========================= */
 
-// chiffres
+// cartes chiffres
 const chiffres = [];
 const couleurs = ["vert", "orange"];
 
@@ -47,12 +50,12 @@ for (let couleur of couleurs) {
   }
 }
 
-// spéciales
+// cartes spéciales (ATTENTION : tourneegenerale)
 const cartesSpeciales = [
   "mytho",
   "doubledose",
   "unpetitdernier?",
-  "tournegenerale",
+  "tourneegenerale",
   "pl(s)",
   "visiontrouble",
   "cestlescopains!",
@@ -71,7 +74,7 @@ const cartesSpeciales = [
   })
 );
 
-// règles
+// cartes règles
 const cartesRegles = ["1", "2", "3", "4"].map(id => ({
   type: "regle",
   image: `assets/cartes/regles/regle-${id}.png`,
@@ -104,7 +107,7 @@ let pile = [];
 let animating = false;
 
 /* =========================
-   INIT
+   INITIALISATION
 ========================= */
 
 function initPile() {
@@ -112,11 +115,12 @@ function initPile() {
   game.innerHTML = "";
   body.classList.remove("special-bg", "reset-bg");
 
+  // 4 cartes règles
   for (let i = 0; i < 4; i++) {
     pile.push(tirerCarte());
   }
 
-  // 5e carte = chiffre
+  // 5e carte = chiffre obligatoire
   pile.push(chiffres[Math.floor(Math.random() * chiffres.length)]);
 
   renderPile();
@@ -153,12 +157,11 @@ function renderPile() {
     card.appendChild(front);
     game.appendChild(card);
 
-    // flip simple
+    // flip + fond rose si carte spéciale (sauf balleneuve)
     if (index === 0) {
       setTimeout(() => {
         card.classList.add("flipped");
 
-        // fond rose SI carte spéciale ET pas balle neuve
         if (
           carte.type === "speciale" &&
           carte.nom !== "balleneuve"
@@ -179,7 +182,7 @@ function tirerEtAnimer() {
   if (animating) return;
   animating = true;
 
-  // retour au fond gris AVANT la nouvelle carte
+  // retour au fond gris avant nouvelle carte
   if (body.classList.contains("special-bg")) {
     body.classList.remove("special-bg");
     body.classList.add("reset-bg");
