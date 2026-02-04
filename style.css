@@ -12,7 +12,7 @@ body {
 }
 
 /* =========================
-   FOND RADIAL (ROSE ⇄ GRIS)
+   FOND RADIAL ROSE (ROBUSTE)
 ========================= */
 
 body::before {
@@ -23,41 +23,26 @@ body::before {
 
   background: radial-gradient(
     circle at center,
-    #FF58FF 0%,
-    transparent 0%
+    rgba(255, 88, 255, 0.85),
+    rgba(255, 88, 255, 0.6) 40%,
+    transparent 70%
   );
 
+  transform: scale(0);
   opacity: 0;
+  transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
-/* arrivée du rose */
+/* apparition du rose */
 body.special-bg::before {
+  transform: scale(1.8);
   opacity: 1;
-  animation: radialIn 0.45s ease-out forwards;
 }
 
 /* retour au gris */
 body.reset-bg::before {
-  opacity: 1;
-  animation: radialOut 0.45s ease-in forwards;
-}
-
-@keyframes radialIn {
-  from {
-    background: radial-gradient(circle at center, #FF58FF 0%, transparent 0%);
-  }
-  to {
-    background: radial-gradient(circle at center, #FF58FF 150%, transparent 151%);
-  }
-}
-
-@keyframes radialOut {
-  from {
-    background: radial-gradient(circle at center, #FF58FF 150%, transparent 151%);
-  }
-  to {
-    background: radial-gradient(circle at center, #FF58FF 0%, transparent 0%);
-  }
+  transform: scale(0);
+  opacity: 0;
 }
 
 /* =========================
@@ -87,12 +72,10 @@ body.reset-bg::before {
   transform: translate(-50%, -50%);
   transform-style: preserve-3d;
 
-  transition:
-    transform 0.5s ease,
-    opacity 0.4s ease;
+  transition: transform 0.5s ease, opacity 0.4s ease;
 }
 
-/* micro feedback tap */
+/* micro-feedback tap */
 .card.tap {
   transform: translate(-50%, -50%) scale(0.96);
 }
@@ -136,7 +119,7 @@ body.reset-bg::before {
 .card.stack-4 { z-index: 1; }
 
 /* =========================
-   FLIP SIMPLE
+   FLIP SIMPLE (STABLE)
 ========================= */
 
 .card.flipped {
