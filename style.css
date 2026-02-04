@@ -12,7 +12,7 @@ body {
 }
 
 /* =========================
-   FOND RADIAL ROSE (ROBUSTE)
+   FOND RADIAL ROSE (STABLE)
 ========================= */
 
 body::before {
@@ -33,13 +33,11 @@ body::before {
   transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
-/* apparition du rose */
 body.special-bg::before {
   transform: scale(1.8);
   opacity: 1;
 }
 
-/* retour au gris */
 body.reset-bg::before {
   transform: scale(0);
   opacity: 0;
@@ -69,39 +67,44 @@ body.reset-bg::before {
   max-width: 340px;
   aspect-ratio: 2.5 / 3.5;
 
-  transform: translate(-50%, -50%);
   transform-style: preserve-3d;
+  transform: translate(-50%, -50%);
 
-  transition: transform 0.5s ease, opacity 0.4s ease;
+  transition:
+    transform 0.5s ease,
+    opacity 0.4s ease;
 }
 
-/* micro-feedback tap */
+/* micro-feedback */
 .card.tap {
   transform: translate(-50%, -50%) scale(0.96);
 }
 
 /* =========================
-   FACES
+   FACES (FIX MOBILE)
 ========================= */
 
 .card-face {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   border-radius: 12px;
 
   background-size: cover;
   background-position: center;
 
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  /* 🔑 FIX BUG MOBILE */
+  transform-style: preserve-3d;
 }
 
 .card-back {
-  transform: rotateY(0deg);
+  transform: rotateY(0deg) translateZ(0.6px);
 }
 
 .card-front {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0.6px);
 }
 
 /* =========================
@@ -133,4 +136,13 @@ body.reset-bg::before {
 .card.exit {
   transform: translate(-50%, -50%) translateX(120%) rotate(25deg);
   opacity: 0;
+}
+
+/* =========================
+   INTRO DISTRIBUTION
+========================= */
+
+.card.intro {
+  opacity: 0;
+  transform: translate(-50%, -140vh) scale(0.9);
 }
