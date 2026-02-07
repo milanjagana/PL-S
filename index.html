@@ -1,17 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>PL'S</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PL'S – Jeu V2</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <!-- SETUP -->
+  <section id="setup" class="screen active">
+    <div class="setup-wrap">
+      <div class="setup-form" id="setupForm">
+        <!-- champs injectés en JS -->
+      </div>
 
-  <div id="game">
-    <div id="card-active"></div>
-  </div>
+      <button id="btnAddPlayer" class="btn btn-add">
+        Ajouter un joueur <span class="plus">+</span>
+      </button>
 
-  <script src="script.js"></script>
+      <button id="btnValidate" class="btn btn-validate">
+        Valider
+      </button>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="play" class="screen">
+    <header class="hud">
+      <div class="hud-left">
+        <span class="hud-label">Tour de</span>
+        <span class="hud-player" id="hudPlayer">Prénom</span>
+      </div>
+
+      <div class="hud-right">
+        <div class="sips">
+          <div class="sips-number" id="hudSips">0</div>
+          <div class="sips-label">gorgées</div>
+        </div>
+      </div>
+    </header>
+
+    <main id="game" aria-label="Zone de jeu">
+      <div id="pile" class="pile" aria-label="Pile de cartes"></div>
+      <div id="specialHint" class="special-hint" aria-hidden="true"></div>
+    </main>
+
+    <footer class="controls">
+      <div id="controlsDefault" class="grid-3x2">
+        <button class="btn-action" data-action="plus">Plus</button>
+        <button class="btn-action" data-action="moins">Moins</button>
+        <button class="btn-action" data-action="orange">Orange</button>
+        <button class="btn-action" data-action="vert">Vert</button>
+        <button class="btn-action" data-action="purple">Purple</button>
+        <button class="btn-action" data-action="fin">Fin de tour</button>
+      </div>
+
+      <!-- PANELS dynamiques -->
+      <div id="panel" class="panel hidden"></div>
+    </footer>
+
+    <!-- POPUP -->
+    <div id="popup" class="popup hidden" role="dialog" aria-modal="true">
+      <div class="popup-card">
+        <button id="popupClose" class="popup-close" aria-label="Fermer">✕</button>
+        <div id="popupText" class="popup-text"></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
 </body>
 </html>
