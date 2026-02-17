@@ -33,7 +33,7 @@ const DOS = {
 /* =========================
    HELPERS
 ========================= */
-function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 
 function randomRotation() {
   // [-8;-4] U [4;8]
@@ -42,24 +42,24 @@ function randomRotation() {
   return +(sign * value).toFixed(2);
 }
 
-function sleep(ms){ return new Promise(res => setTimeout(res, ms)); }
+function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
 
-function escapeHtml(str){
+function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, s => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   }[s]));
 }
 
-function showPopup(html){
+function showPopup(html) {
   popupText.innerHTML = html;
   popup.classList.remove("hidden");
 }
-function hidePopup(){
+function hidePopup() {
   popup.classList.add("hidden");
   popupText.innerHTML = "";
 }
 popupClose.addEventListener("click", hidePopup);
-popup.addEventListener("click", (e)=>{ if(e.target === popup) hidePopup(); });
+popup.addEventListener("click", (e) => { if (e.target === popup) hidePopup(); });
 
 /* =========================
    DATA: cartes
@@ -67,7 +67,7 @@ popup.addEventListener("click", (e)=>{ if(e.target === popup) hidePopup(); });
 ========================= */
 const couleurs = ["vert", "orange"];
 
-function makeChiffreCarte(value, couleur){
+function makeChiffreCarte(value, couleur) {
   return {
     type: "chiffre",
     valeur: value,
@@ -94,7 +94,7 @@ const specialNames = [
   "balleneuve"
 ];
 
-function makeSpecialeCarte(nom){
+function makeSpecialeCarte(nom) {
   return {
     type: "speciale",
     nom,
@@ -104,7 +104,7 @@ function makeSpecialeCarte(nom){
   };
 }
 
-const regles = ["1","2","3","4"].map((id, idx)=>({
+const regles = ["1", "2", "3", "4"].map((id, idx) => ({
   type: "regle",
   nom: id,
   image: `assets/cartes/regles/regle-${id}.png`,
@@ -154,13 +154,13 @@ let pending = null;               // stockage temporaire selon mode
 /* =========================
    SETUP UI
 ========================= */
-function renderSetupInputs(count){
+function renderSetupInputs(count) {
   setupForm.innerHTML = "";
-  for(let i=1;i<=count;i++){
+  for (let i = 1; i <= count; i++) {
     const input = document.createElement("input");
     input.className = "player-input";
     input.placeholder = `Nom du joueur ${i}…`;
-    input.dataset.idx = String(i-1);
+    input.dataset.idx = String(i - 1);
     setupForm.appendChild(input);
   }
 }
@@ -168,16 +168,16 @@ function renderSetupInputs(count){
 let setupCount = 1;
 renderSetupInputs(setupCount);
 
-btnAddPlayer.addEventListener("click", ()=>{
+btnAddPlayer.addEventListener("click", () => {
   setupCount += 1;
   renderSetupInputs(setupCount);
 });
 
-btnValidate.addEventListener("click", ()=>{
+btnValidate.addEventListener("click", () => {
   const inputs = [...setupForm.querySelectorAll("input")];
   const names = inputs.map(i => i.value.trim()).filter(Boolean);
 
-  if(names.length < 2){
+  if (names.length < 2) {
     showPopup(`<span class="pink">Il faut au moins 2 joueurs.</span>`);
     return;
   }
@@ -196,59 +196,59 @@ btnValidate.addEventListener("click", ()=>{
 let lastGeneratedWasSpecial = false;
 let firstNonRuleForced = true;
 
-function resetDeckLogic(){
+function resetDeckLogic() {
   piocheInitiale = [...regles]; // dans l’ordre
   lastGeneratedWasSpecial = false;
   firstNonRuleForced = true;
 }
 
-function drawFromInitial(){
-  if(piocheInitiale.length > 0) return piocheInitiale.shift();
+function drawFromInitial() {
+  if (piocheInitiale.length > 0) return piocheInitiale.shift();
   return null;
 }
 
-function drawInfinite(){
+function drawInfinite() {
   // force tout premier non-règle = chiffre
-  if(firstNonRuleForced){
+  if (firstNonRuleForced) {
     firstNonRuleForced = false;
-    const v = Math.floor(Math.random()*10);
-    const c = couleurs[Math.floor(Math.random()*couleurs.length)];
+    const v = Math.floor(Math.random() * 10);
+    const c = couleurs[Math.floor(Math.random() * couleurs.length)];
     lastGeneratedWasSpecial = false;
-    return makeChiffreCarte(v,c);
+    return makeChiffreCarte(v, c);
   }
 
   // si la précédente générée était spéciale => forcer chiffre
-  if(lastGeneratedWasSpecial){
-    const v = Math.floor(Math.random()*10);
-    const c = couleurs[Math.floor(Math.random()*couleurs.length)];
+  if (lastGeneratedWasSpecial) {
+    const v = Math.floor(Math.random() * 10);
+    const c = couleurs[Math.floor(Math.random() * couleurs.length)];
     lastGeneratedWasSpecial = false;
-    return makeChiffreCarte(v,c);
+    return makeChiffreCarte(v, c);
   }
 
   // pondération 4:1 (chiffre:speciale)
   const roll = Math.random();
-  if(roll < 0.80){ // ~80% chiffre
-    const v = Math.floor(Math.random()*10);
-    const c = couleurs[Math.floor(Math.random()*couleurs.length)];
+  if (roll < 0.80) { // ~80% chiffre
+    const v = Math.floor(Math.random() * 10);
+    const c = couleurs[Math.floor(Math.random() * couleurs.length)];
     lastGeneratedWasSpecial = false;
-    return makeChiffreCarte(v,c);
-  }else{
-    const nom = specialNames[Math.floor(Math.random()*specialNames.length)];
+    return makeChiffreCarte(v, c);
+  } else {
+    const nom = specialNames[Math.floor(Math.random() * specialNames.length)];
     lastGeneratedWasSpecial = true;
     return makeSpecialeCarte(nom);
   }
 }
 
-function tirerCarte(){
+function tirerCarte() {
   const init = drawFromInitial();
-  if(init) return init;
+  if (init) return init;
   return drawInfinite();
 }
 
 /* =========================
    INITIALISATION PARTIE
 ========================= */
-function startGame(){
+function startGame() {
   // reset états
   compteur = 0;
   hasWonThisTurn = false;
@@ -274,27 +274,27 @@ function startGame(){
   playScreen.classList.add("active");
 }
 
-async function initPileAndLaunch(){
+async function initPileAndLaunch() {
   animating = true;
-  body.classList.remove("special-bg","reset-bg");
+  body.classList.remove("special-bg", "reset-bg");
 
   pile = [];
   pileEl.innerHTML = "";
 
   // prépare les 5 premières (4 règles + 1 chiffre)
   const firstFive = [];
-  for(let i=0;i<4;i++) firstFive.push(tirerCarte());
+  for (let i = 0; i < 4; i++) firstFive.push(tirerCarte());
   firstFive.push(tirerCarte()); // chiffre forcé par logique
 
   // distribution "une par une par le haut"
-  for(let i=0;i<5;i++){
+  for (let i = 0; i < 5; i++) {
     pile.push(firstFive[i]);
     renderPile(true); // render partiel
     await sleep(120);
 
     // petit effet "deal"
     const card = pileEl.querySelector(`.card[data-idx="${i}"]`);
-    if(card){
+    if (card) {
       card.classList.add("enter-left");
       await sleep(80);
       card.classList.remove("enter-left");
@@ -316,10 +316,10 @@ async function initPileAndLaunch(){
 /* =========================
    RENDU PILE
 ========================= */
-function renderPile(isDealing){
+function renderPile(isDealing) {
   pileEl.innerHTML = "";
 
-  const visible = pile.slice(0,5);
+  const visible = pile.slice(0, 5);
 
   visible.forEach((carte, index) => {
     const card = document.createElement("div");
@@ -327,11 +327,10 @@ function renderPile(isDealing){
     card.dataset.idx = String(index);
 
     // transform pour pile
-    if(index === 0){
+    if (index === 0) {
       card.classList.add("active");
-      // rotation nulle pour la carte du dessus
-      card.style.transform = `translate(-50%, -50%)`;
-    }else{
+      // transform géré par CSS (.card.active / .card.flipped) pour animer le flip
+    } else {
       card.classList.add(`stack-${index}`);
       const rot = carte.rotation ?? randomRotation();
       const y = index * 14;
@@ -351,23 +350,23 @@ function renderPile(isDealing){
     pileEl.appendChild(card);
 
     // au deal, on ne flip pas immédiatement
-    if(!isDealing && index === 0){
+    if (!isDealing && index === 0) {
       // flip géré par flipActiveAndApplyHalo()
       // on laisse tel quel ici
     }
   });
 }
 
-function flipActiveAndApplyHalo(){
+function flipActiveAndApplyHalo() {
   const active = pileEl.querySelector(".card.active");
-  if(!active) return;
+  if (!active) return;
 
   // flip
   active.classList.add("flipped");
 
   const top = pile[0];
   // halo rose si carte spéciale (sauf balleneuve)
-  if(top && top.type === "speciale" && top.nom !== "balleneuve"){
+  if (top && top.type === "speciale" && top.nom !== "balleneuve") {
     body.classList.remove("reset-bg");
     body.classList.add("special-bg");
   }
@@ -376,13 +375,13 @@ function flipActiveAndApplyHalo(){
 /* =========================
    NAVIGATION TOUR / HUD
 ========================= */
-function currentPlayerName(){
+function currentPlayerName() {
   return joueurs[joueurIndex] ?? "Joueur";
 }
-function nextPlayerIndex(){
+function nextPlayerIndex() {
   return (joueurIndex + 1) % joueurs.length;
 }
-function setPlayer(idx){
+function setPlayer(idx) {
   joueurIndex = (idx + joueurs.length) % joueurs.length;
   hasWonThisTurn = false;
   updateHUD();
@@ -390,13 +389,13 @@ function setPlayer(idx){
   updateActionsAvailability();
 }
 
-function updateHUD(){
+function updateHUD() {
   hudPlayer.textContent = currentPlayerName();
   hudSips.textContent = String(compteur);
 }
 
-function applyNextTurnConstraintIfNeeded(){
-  if(nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied){
+function applyNextTurnConstraintIfNeeded() {
+  if (nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied) {
     // le joueur doit faire 2 wins consécutifs ou tenter purple
   }
 }
@@ -404,15 +403,15 @@ function applyNextTurnConstraintIfNeeded(){
 /* =========================
    BOUTONS DEFAULT
 ========================= */
-controlsDefault.addEventListener("click", (e)=>{
+controlsDefault.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
-  if(!btn) return;
+  if (!btn) return;
   const action = btn.dataset.action;
-  if(!action) return;
+  if (!action) return;
 
-  if(btn.disabled) return;
+  if (btn.disabled) return;
 
-  if(action === "fin"){
+  if (action === "fin") {
     attemptEndTurn();
     return;
   }
@@ -423,15 +422,15 @@ controlsDefault.addEventListener("click", (e)=>{
 /* =========================
    DISPONIBILITÉS ACTIONS
 ========================= */
-function setButtonState(action, enabled){
+function setButtonState(action, enabled) {
   const btn = controlsDefault.querySelector(`.btn-action[data-action="${action}"]`);
-  if(!btn) return;
+  if (!btn) return;
   btn.disabled = !enabled;
   btn.classList.toggle("disabled", !enabled);
 }
 
-function updateActionsAvailability(){
-  if(uiMode !== "default"){
+function updateActionsAvailability() {
+  if (uiMode !== "default") {
     // en UI spéciale, on cache grille
     controlsDefault.style.display = "none";
     return;
@@ -443,19 +442,19 @@ function updateActionsAvailability(){
   const top = pile[0];
 
   // par défaut
-  ["plus","moins","orange","vert","purple","fin"].forEach(a => setButtonState(a, true));
+  ["plus", "moins", "orange", "vert", "purple", "fin"].forEach(a => setButtonState(a, true));
 
   // fin de tour: seulement si au moins un guess gagné dans ce tour
   // + pas autorisé si contrainte TN active non satisfaite
   let canEnd = hasWonThisTurn;
 
-  if(nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied){
+  if (nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied) {
     canEnd = false;
   }
   setButtonState("fin", canEnd);
 
   // si top carte règle ou spéciale => pas le droit Plus/Moins
-  if(!top || top.type !== "chiffre"){
+  if (!top || top.type !== "chiffre") {
     setButtonState("plus", false);
     setButtonState("moins", false);
   }
@@ -474,31 +473,31 @@ function updateActionsAvailability(){
 /* =========================
    FLUX PRINCIPAL: faire un guess
 ========================= */
-async function handleGuessAction(action){
-  if(animating) return;
+async function handleGuessAction(action) {
+  if (animating) return;
 
   // Si carte spéciale en haut => on n’accepte pas un guess "normal"
   const top = pile[0];
-  if(!top) return;
+  if (!top) return;
 
   // “C’est cadeau” : le prochain joueur choisit à ta place
-  if(cadeauActive && cadeauActive.forPlayerIndex === joueurIndex){
+  if (cadeauActive && cadeauActive.forPlayerIndex === joueurIndex) {
     // on ignore le clic du joueur courant, on force UI où le prochain joueur choisit
     await startCadeauChooser();
     return;
   }
 
-  if(action === "purple"){
+  if (action === "purple") {
     await resolvePurple();
     return;
   }
 
-  if(action === "orange" || action === "vert"){
+  if (action === "orange" || action === "vert") {
     await resolveColorGuess(action);
     return;
   }
 
-  if(action === "plus" || action === "moins"){
+  if (action === "plus" || action === "moins") {
     await resolvePlusMoins(action);
     return;
   }
@@ -507,20 +506,20 @@ async function handleGuessAction(action){
 /* =========================
    ANIM + SHIFT PILE (1 carte)
 ========================= */
-async function advanceOneCard(){
+async function advanceOneCard() {
   animating = true;
 
   // si halo actif, disparition ext->centre
-  if(body.classList.contains("special-bg")){
+  if (body.classList.contains("special-bg")) {
     body.classList.remove("special-bg");
     body.classList.add("reset-bg");
-    setTimeout(()=> body.classList.remove("reset-bg"), 450);
+    setTimeout(() => body.classList.remove("reset-bg"), 450);
   }
 
   const activeEl = pileEl.querySelector(".card.active");
-  if(activeEl){
+  if (activeEl) {
     activeEl.classList.add("tap");
-    setTimeout(()=> activeEl.classList.remove("tap"), 120);
+    setTimeout(() => activeEl.classList.remove("tap"), 120);
 
     activeEl.classList.add("exit-right");
   }
@@ -549,17 +548,17 @@ async function advanceOneCard(){
    ANIM + SHIFT PILE (2 cartes) pour Purple/Analyse
    - montre 2 cartes 3s puis conserve la 2e comme actuelle
 ========================= */
-async function advanceTwoCardsAndKeepSecond(){
+async function advanceTwoCardsAndKeepSecond() {
   animating = true;
 
-  if(body.classList.contains("special-bg")){
+  if (body.classList.contains("special-bg")) {
     body.classList.remove("special-bg");
     body.classList.add("reset-bg");
-    setTimeout(()=> body.classList.remove("reset-bg"), 450);
+    setTimeout(() => body.classList.remove("reset-bg"), 450);
   }
 
   const activeEl = pileEl.querySelector(".card.active");
-  if(activeEl) activeEl.classList.add("exit-right");
+  if (activeEl) activeEl.classList.add("exit-right");
 
   await sleep(450);
 
@@ -573,7 +572,7 @@ async function advanceTwoCardsAndKeepSecond(){
   pile = [second, ...rest];
 
   // Remplir jusqu'à 5 visibles
-  while(pile.length < 5){
+  while (pile.length < 5) {
     pile.push(tirerCarte());
   }
 
@@ -594,13 +593,13 @@ async function advanceTwoCardsAndKeepSecond(){
 /* =========================
    LOGIQUE GUESS: Plus/Moins
 ========================= */
-async function resolvePlusMoins(dir){
+async function resolvePlusMoins(dir) {
   const top = pile[0];
   const next = pile[1];
-  if(!top || !next) return;
+  if (!top || !next) return;
 
   // si top pas chiffre => interdit
-  if(top.type !== "chiffre"){
+  if (top.type !== "chiffre") {
     return;
   }
 
@@ -610,21 +609,21 @@ async function resolvePlusMoins(dir){
   // Mais next peut quand même être spéciale si générée; dans ce cas le guess est perdu.
   let win = false;
 
-  if(next.type === "chiffre"){
-    if(dir === "plus") win = next.valeur > top.valeur;
-    if(dir === "moins") win = next.valeur < top.valeur;
-  }else{
+  if (next.type === "chiffre") {
+    if (dir === "plus") win = next.valeur > top.valeur;
+    if (dir === "moins") win = next.valeur < top.valeur;
+  } else {
     win = false;
   }
 
   // mytho inverse
-  if(mythoActive) win = !win;
+  if (mythoActive) win = !win;
 
-  if(win){
+  if (win) {
     onWin(1);
     await advanceOneCard();
-  }else{
-    await onLoseFlow({reason: "guess"});
+  } else {
+    await onLoseFlow({ reason: "guess" });
     // le tour se termine => on révèle quand même la carte suivante visuellement
     await advanceOneCard();
     endTurnToNextPlayer();
@@ -634,25 +633,25 @@ async function resolvePlusMoins(dir){
 /* =========================
    LOGIQUE GUESS: Couleur
 ========================= */
-async function resolveColorGuess(color){
+async function resolveColorGuess(color) {
   const next = pile[1];
-  if(!next) return;
+  if (!next) return;
 
   let win = false;
-  if(next.type === "chiffre"){
+  if (next.type === "chiffre") {
     win = (next.couleur === color);
-  }else{
+  } else {
     // une spéciale n’est ni vert ni orange => faux
     win = false;
   }
 
-  if(mythoActive) win = !win;
+  if (mythoActive) win = !win;
 
-  if(win){
+  if (win) {
     onWin(1);
     await advanceOneCard();
-  }else{
-    await onLoseFlow({reason: "guess"});
+  } else {
+    await onLoseFlow({ reason: "guess" });
     await advanceOneCard();
     endTurnToNextPlayer();
   }
@@ -661,30 +660,30 @@ async function resolveColorGuess(color){
 /* =========================
    LOGIQUE GUESS: Purple
 ========================= */
-async function resolvePurple(){
+async function resolvePurple() {
   const c1 = pile[1];
   const c2 = pile[2];
-  if(!c1 || !c2) return;
+  if (!c1 || !c2) return;
 
   // purple seulement si 2 chiffres
-  if(c1.type !== "chiffre" || c2.type !== "chiffre") return;
+  if (c1.type !== "chiffre" || c2.type !== "chiffre") return;
 
   const diff = (c1.couleur !== c2.couleur);
   let win = diff;
 
-  if(mythoActive) win = !win;
+  if (mythoActive) win = !win;
 
   // montrer 2 cartes 3 secondes:
   // on révèle carte 1 puis carte 2 en avançant 2 cartes mais on “garde” la 2e
-  if(win){
+  if (win) {
     onWin(2);
     // petit délai "visible 3s" simulé: on avance visuellement et on attend
     await advanceOneCard();      // révèle c1 comme active
     await sleep(3000);
     // puis on passe à c2 comme active, sans re-compter
     await advanceOneCard();      // révèle c2 comme active
-  }else{
-    await onLoseFlow({reason: "purple"});
+  } else {
+    await onLoseFlow({ reason: "purple" });
     // on avance quand même (2 cartes visibles 3s puis c2 devient active)
     await advanceOneCard();      // révèle c1
     await sleep(3000);
@@ -693,7 +692,7 @@ async function resolvePurple(){
   }
 
   // satisfaire la contrainte TN si le joueur a "tenté un purple"
-  if(nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied){
+  if (nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied) {
     nextTurnConstraint.satisfied = true;
   }
 }
@@ -701,14 +700,14 @@ async function resolvePurple(){
 /* =========================
    COMPTEUR / GAIN / PERTE
 ========================= */
-function onWin(add){
+function onWin(add) {
   compteur += add;
   hasWonThisTurn = true;
 
   // contrainte TN: 2 wins consécutifs
-  if(nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied){
+  if (nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied) {
     nextTurnConstraint.remainingWins -= 1;
-    if(nextTurnConstraint.remainingWins <= 0){
+    if (nextTurnConstraint.remainingWins <= 0) {
       nextTurnConstraint.satisfied = true;
     }
   }
@@ -716,7 +715,7 @@ function onWin(add){
   updateHUD();
 }
 
-async function onLoseFlow({reason}){
+async function onLoseFlow({ reason }) {
   // la perte fait boire compteur (avec effets)
   const amountBase = compteur;
   const amount = doubleDoseActive ? (amountBase * 2) : amountBase;
@@ -725,36 +724,36 @@ async function onLoseFlow({reason}){
   let drinkers = [joueurIndex];
 
   // Pilier
-  if(pilierActive && pilierActive.forPlayerIndex === joueurIndex){
+  if (pilierActive && pilierActive.forPlayerIndex === joueurIndex) {
     drinkers = Array.from(new Set([joueurIndex, pilierActive.otherIndex]));
   }
 
   // Copains
-  if(copainsActive && copainsActive.forPlayerIndex === joueurIndex){
+  if (copainsActive && copainsActive.forPlayerIndex === joueurIndex) {
     const selected = copainsActive.selectedIndices;
-    if(selected.length > 0){
+    if (selected.length > 0) {
       const group = [joueurIndex, ...selected];
       const per = Math.ceil(amount / group.length);
 
       // reste au dernier TN (approx) si pas divisible
       const total = per * group.length;
       const extra = total - amount;
-      if(extra > 0){
+      if (extra > 0) {
         // on “retire” l’extra à tous en l’ajoutant au TN (approx)
         // => simplification: message indique juste “partagé”
       }
 
       const names = group.map(i => joueurs[i]);
-      showPopup(`${names.map(n=>`<span class="pink">${escapeHtml(n)}</span>`).join(", ")} boivent <span class="pink">${per}</span> gorgées. Plastiquement vôtre !`);
-    }else{
+      showPopup(`${names.map(n => `<span class="pink">${escapeHtml(n)}</span>`).join(", ")} boivent <span class="pink">${per}</span> gorgées. Plastiquement vôtre !`);
+    } else {
       // personne choisi => boit seul
       const name = joueurs[joueurIndex];
       showPopup(`<span class="pink">${escapeHtml(name)}</span> boit <span class="pink">${amount}</span> gorgées. Plastiquement vôtre !`);
     }
-  }else{
+  } else {
     // normal
     const names = drinkers.map(i => joueurs[i]);
-    showPopup(`${names.map(n=>`<span class="pink">${escapeHtml(n)}</span>`).join(", ")} boivent <span class="pink">${amount}</span> gorgées. Plastiquement vôtre !`);
+    showPopup(`${names.map(n => `<span class="pink">${escapeHtml(n)}</span>`).join(", ")} boivent <span class="pink">${amount}</span> gorgées. Plastiquement vôtre !`);
   }
 
   // reset compteur + états “jusqu’à ce que quelqu’un boive”
@@ -776,10 +775,10 @@ async function onLoseFlow({reason}){
 /* =========================
    FIN DE TOUR
 ========================= */
-function attemptEndTurn(){
-  if(!hasWonThisTurn) return;
+function attemptEndTurn() {
+  if (!hasWonThisTurn) return;
 
-  if(nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied){
+  if (nextTurnConstraint && nextTurnConstraint.playerIndex === joueurIndex && !nextTurnConstraint.satisfied) {
     return;
   }
 
@@ -787,7 +786,7 @@ function attemptEndTurn(){
   endTurnToNextPlayer();
 }
 
-function endTurnToNextPlayer(){
+function endTurnToNextPlayer() {
   const next = nextPlayerIndex();
   setPlayer(next);
 }
@@ -796,17 +795,17 @@ function endTurnToNextPlayer(){
    QUAND UNE CARTE EST RÉVÉLÉE
    - si spéciale: applique effet & adapte interface
 ========================= */
-async function onCardRevealed(){
+async function onCardRevealed() {
   const top = pile[0];
-  if(!top) return;
+  if (!top) return;
 
   // règles: aucun effet logique, juste affichées (elles ne reviennent plus)
-  if(top.type === "regle"){
+  if (top.type === "regle") {
     return;
   }
 
   // chiffres: rien à faire
-  if(top.type === "chiffre"){
+  if (top.type === "chiffre") {
     return;
   }
 
@@ -814,24 +813,24 @@ async function onCardRevealed(){
   const nom = top.nom;
 
   // Pression sociale (pas en numérique)
-  if(nom === "pressionsociale"){
+  if (nom === "pressionsociale") {
     showPopup(`Carte <span class="pink">Pression sociale</span> : votez à l’oral pour choisir le prochain guess.`);
     return;
   }
 
-  if(nom === "mytho"){
+  if (nom === "mytho") {
     mythoActive = true;
     showPopup(`Carte <span class="pink">Mytho</span> : jusqu’à ce que quelqu’un boive, <span class="pink">vrai</span> et <span class="pink">faux</span> sont inversés.`);
     return;
   }
 
-  if(nom === "doubledose"){
+  if (nom === "doubledose") {
     doubleDoseActive = true;
     showPopup(`Carte <span class="pink">Double dose</span> : jusqu’à ce que quelqu’un boive, chaque gorgée compte <span class="pink">double</span>.`);
     return;
   }
 
-  if(nom === "unpetitdernier?"){
+  if (nom === "unpetitdernier?") {
     // contrainte sur le prochain joueur
     const next = nextPlayerIndex();
     nextTurnConstraint = { playerIndex: next, remainingWins: 2, satisfied: false };
@@ -840,14 +839,14 @@ async function onCardRevealed(){
     return;
   }
 
-  if(nom === "tourneegenerale"){
+  if (nom === "tourneegenerale") {
     // reset compteur + fin de tour
     compteur = 0;
     mythoActive = false;
     doubleDoseActive = false;
     hasWonThisTurn = false;
 
-    const names = joueurs.map(n=>`<span class="pink">${escapeHtml(n)}</span>`).join(", ");
+    const names = joueurs.map(n => `<span class="pink">${escapeHtml(n)}</span>`).join(", ");
     showPopup(`Carte <span class="pink">Tournée générale</span> : ${names} boivent <span class="pink">1</span> gorgée. Plastiquement vôtre !`);
 
     endTurnToNextPlayer();
@@ -855,7 +854,7 @@ async function onCardRevealed(){
     return;
   }
 
-  if(nom === "balleneuve"){
+  if (nom === "balleneuve") {
     // finit son verre + tour fini + compteur reset
     const p = currentPlayerName();
     compteur = 0;
@@ -869,39 +868,39 @@ async function onCardRevealed(){
     return;
   }
 
-  if(nom === "pl(s)"){
+  if (nom === "pl(s)") {
     startPLSMode();
     return;
   }
 
-  if(nom === "visiontrouble"){
+  if (nom === "visiontrouble") {
     startVisionTroubleMode();
     return;
   }
 
-  if(nom === "cestlescopains!"){
+  if (nom === "cestlescopains!") {
     startCopainsMode();
     return;
   }
 
-  if(nom === "pilierdecomptoir"){
+  if (nom === "pilierdecomptoir") {
     startPilierMode();
     return;
   }
 
-  if(nom === "analyse"){
+  if (nom === "analyse") {
     startAnalyseMode();
     return;
   }
 
-  if(nom === "cestcadeau"){
+  if (nom === "cestcadeau") {
     // prochain joueur choisit le prochain guess du joueur actuel
     cadeauActive = { forPlayerIndex: joueurIndex, chooserPlayerIndex: nextPlayerIndex() };
     showPopup(`Carte <span class="pink">C’est cadeau</span> : <span class="pink">${escapeHtml(joueurs[cadeauActive.chooserPlayerIndex])}</span> choisit ton prochain guess. Si c’est faux, <span class="pink">tu bois</span>.`);
     return;
   }
 
-  if(nom === "lapetitesoeur"){
+  if (nom === "lapetitesoeur") {
     petiteSoeurActive = { forPlayerIndex: joueurIndex };
     showPopup(`Carte <span class="pink">La petite soeur</span> : si tu perds au prochain guess, tu peux tenter un <span class="pink">Purple</span> pour t’en sortir. Échec = <span class="pink">double</span>.`);
     return;
@@ -911,13 +910,13 @@ async function onCardRevealed(){
 /* =========================
    UI SPÉCIALES
 ========================= */
-function switchToPanel(){
+function switchToPanel() {
   controlsDefault.style.display = "none";
   panel.classList.remove("hidden");
   panel.innerHTML = "";
 }
 
-function backToDefaultUI(){
+function backToDefaultUI() {
   uiMode = "default";
   pending = null;
   panel.classList.add("hidden");
@@ -927,7 +926,7 @@ function backToDefaultUI(){
 }
 
 /* ---- PL(S): choisir valeur exacte 0..9 ---- */
-function startPLSMode(){
+function startPLSMode() {
   uiMode = "pls_value";
   pending = { value: null };
   switchToPanel();
@@ -938,13 +937,13 @@ function startPLSMode(){
   const grid = document.createElement("div");
   grid.className = "panel-grid";
 
-  for(let i=0;i<=9;i++){
+  for (let i = 0; i <= 9; i++) {
     const b = document.createElement("button");
     b.className = "btn-action";
     b.textContent = String(i);
-    b.addEventListener("click", ()=>{
+    b.addEventListener("click", () => {
       pending.value = i;
-      [...grid.querySelectorAll("button")].forEach(x=> x.classList.remove("armed"));
+      [...grid.querySelectorAll("button")].forEach(x => x.classList.remove("armed"));
       b.classList.add("armed");
       b.dataset.color = "white";
     });
@@ -955,8 +954,8 @@ function startPLSMode(){
   validate.className = "btn-action armed";
   validate.dataset.color = "white";
   validate.textContent = "Valider";
-  validate.addEventListener("click", async ()=>{
-    if(pending.value === null) return;
+  validate.addEventListener("click", async () => {
+    if (pending.value === null) return;
 
     // on révèle la prochaine carte
     const next = pile[1];
@@ -965,11 +964,11 @@ function startPLSMode(){
     // la carte révélée devient pile[0] => c'est l'ancienne "next"
     const revealed = pile[0];
 
-    if(revealed.type === "chiffre" && revealed.valeur === pending.value){
-      const others = joueurs.filter((_,i)=> i !== joueurIndex)
-        .map(n=>`<span class="pink">${escapeHtml(n)}</span>`).join(", ");
+    if (revealed.type === "chiffre" && revealed.valeur === pending.value) {
+      const others = joueurs.filter((_, i) => i !== joueurIndex)
+        .map(n => `<span class="pink">${escapeHtml(n)}</span>`).join(", ");
       showPopup(`${others} finissent <span class="pink">leur verre</span> (sauf toi). Plastiquement vôtre !`);
-    }else{
+    } else {
       showPopup(`<span class="pink">${escapeHtml(currentPlayerName())}</span> finit <span class="pink">son verre</span>. Plastiquement vôtre !`);
     }
 
@@ -982,7 +981,7 @@ function startPLSMode(){
 }
 
 /* ---- Vision trouble: choisir couleur + plus/moins puis Valider ---- */
-function startVisionTroubleMode(){
+function startVisionTroubleMode() {
   uiMode = "vision";
   pending = { color: null, pm: null };
   switchToPanel();
@@ -993,15 +992,15 @@ function startVisionTroubleMode(){
   const row1 = document.createElement("div");
   row1.className = "panel-row";
 
-  const bPlus = mkSelectBtn("Plus", "white", ()=> pending.pm = "plus", ()=> pending.pm === "plus");
-  const bMoins = mkSelectBtn("Moins", "white", ()=> pending.pm = "moins", ()=> pending.pm === "moins");
+  const bPlus = mkSelectBtn("Plus", "white", () => pending.pm = "plus", () => pending.pm === "plus");
+  const bMoins = mkSelectBtn("Moins", "white", () => pending.pm = "moins", () => pending.pm === "moins");
   row1.appendChild(bPlus); row1.appendChild(bMoins);
 
   const row2 = document.createElement("div");
   row2.className = "panel-row";
 
-  const bOrange = mkSelectBtn("Orange", "orange", ()=> pending.color = "orange", ()=> pending.color === "orange");
-  const bVert = mkSelectBtn("Vert", "vert", ()=> pending.color = "vert", ()=> pending.color === "vert");
+  const bOrange = mkSelectBtn("Orange", "orange", () => pending.color = "orange", () => pending.color === "orange");
+  const bVert = mkSelectBtn("Vert", "vert", () => pending.color = "vert", () => pending.color === "vert");
   row2.appendChild(bOrange); row2.appendChild(bVert);
 
   const validate = document.createElement("button");
@@ -1009,14 +1008,14 @@ function startVisionTroubleMode(){
   validate.textContent = "Valider";
   validate.disabled = true;
 
-  function refresh(){
+  function refresh() {
     // recolor selected
-    [bPlus,bMoins,bOrange,bVert].forEach(b=>{
+    [bPlus, bMoins, bOrange, bVert].forEach(b => {
       b.classList.toggle("armed", b._isSelected());
-      if(b._isSelected()){
+      if (b._isSelected()) {
         b.dataset.color = b._color;
         b.style.color = "#000";
-      }else{
+      } else {
         b.dataset.color = "";
         b.style.color = "";
       }
@@ -1025,24 +1024,24 @@ function startVisionTroubleMode(){
     const ok = pending.pm && pending.color;
     validate.disabled = !ok;
     validate.classList.toggle("disabled", !ok);
-    if(ok){
+    if (ok) {
       validate.classList.add("armed");
       validate.dataset.color = "white";
-    }else{
+    } else {
       validate.classList.remove("armed");
       validate.dataset.color = "";
     }
   }
 
-  [bPlus,bMoins,bOrange,bVert].forEach(b=> b.addEventListener("click", refresh));
+  [bPlus, bMoins, bOrange, bVert].forEach(b => b.addEventListener("click", refresh));
   refresh();
 
-  validate.addEventListener("click", async ()=>{
-    if(!(pending.pm && pending.color)) return;
+  validate.addEventListener("click", async () => {
+    if (!(pending.pm && pending.color)) return;
 
     const top = pile[0];
     const next = pile[1];
-    if(!top || !next){
+    if (!top || !next) {
       backToDefaultUI();
       return;
     }
@@ -1055,27 +1054,27 @@ function startVisionTroubleMode(){
     let okColor = false;
     let okPM = false;
 
-    if(revealed.type === "chiffre"){
+    if (revealed.type === "chiffre") {
       okColor = (revealed.couleur === pending.color);
-      if(top.type === "chiffre"){
-        if(pending.pm === "plus") okPM = revealed.valeur > top.valeur;
-        if(pending.pm === "moins") okPM = revealed.valeur < top.valeur;
-      }else{
+      if (top.type === "chiffre") {
+        if (pending.pm === "plus") okPM = revealed.valeur > top.valeur;
+        if (pending.pm === "moins") okPM = revealed.valeur < top.valeur;
+      } else {
         okPM = false;
       }
     }
 
     let win = (okColor || okPM);
-    if(mythoActive) win = !win;
+    if (mythoActive) win = !win;
 
-    if(win){
+    if (win) {
       onWin(1);
-    }else{
+    } else {
       // si “petite soeur” active, proposer purple de sauvetage
-      if(petiteSoeurActive && petiteSoeurActive.forPlayerIndex === joueurIndex){
+      if (petiteSoeurActive && petiteSoeurActive.forPlayerIndex === joueurIndex) {
         await petiteSoeurRescueFlow();
-      }else{
-        await onLoseFlow({reason:"visiontrouble"});
+      } else {
+        await onLoseFlow({ reason: "visiontrouble" });
         endTurnToNextPlayer();
       }
     }
@@ -1089,20 +1088,20 @@ function startVisionTroubleMode(){
   panel.appendChild(wrap);
 }
 
-function mkSelectBtn(text, colorKey, onClick, isSelected){
+function mkSelectBtn(text, colorKey, onClick, isSelected) {
   const b = document.createElement("button");
   b.className = "btn-action";
   b.textContent = text;
   b._color = colorKey;
   b._isSelected = isSelected;
   b.addEventListener("click", onClick);
-  if(colorKey === "orange") b.style.color = "var(--orange)";
-  if(colorKey === "vert") b.style.color = "var(--vert)";
+  if (colorKey === "orange") b.style.color = "var(--orange)";
+  if (colorKey === "vert") b.style.color = "var(--vert)";
   return b;
 }
 
 /* ---- Copains: choisir joueurs à partager (sans le joueur actuel) ---- */
-function startCopainsMode(){
+function startCopainsMode() {
   uiMode = "copains";
   pending = { selected: new Set() };
   switchToPanel();
@@ -1113,19 +1112,19 @@ function startCopainsMode(){
   const list = document.createElement("div");
   list.className = "panel-list";
 
-  joueurs.forEach((name, idx)=>{
-    if(idx === joueurIndex) return;
+  joueurs.forEach((name, idx) => {
+    if (idx === joueurIndex) return;
     const b = document.createElement("button");
     b.className = "btn-action";
     b.textContent = name;
 
-    b.addEventListener("click", ()=>{
-      if(pending.selected.has(idx)){
+    b.addEventListener("click", () => {
+      if (pending.selected.has(idx)) {
         pending.selected.delete(idx);
         b.classList.remove("armed");
         b.dataset.color = "";
         b.style.color = "";
-      }else{
+      } else {
         pending.selected.add(idx);
         b.classList.add("armed");
         b.dataset.color = "purple";
@@ -1140,7 +1139,7 @@ function startCopainsMode(){
   validate.className = "btn-action armed";
   validate.dataset.color = "white";
   validate.textContent = "Valider";
-  validate.addEventListener("click", ()=>{
+  validate.addEventListener("click", () => {
     copainsActive = {
       forPlayerIndex: joueurIndex,
       selectedIndices: [...pending.selected]
@@ -1155,7 +1154,7 @@ function startCopainsMode(){
 }
 
 /* ---- Pilier: choisir 1 joueur ---- */
-function startPilierMode(){
+function startPilierMode() {
   uiMode = "pilier";
   pending = { selected: null };
   switchToPanel();
@@ -1166,14 +1165,14 @@ function startPilierMode(){
   const list = document.createElement("div");
   list.className = "panel-list";
 
-  joueurs.forEach((name, idx)=>{
-    if(idx === joueurIndex) return;
+  joueurs.forEach((name, idx) => {
+    if (idx === joueurIndex) return;
     const b = document.createElement("button");
     b.className = "btn-action";
     b.textContent = name;
-    b.addEventListener("click", ()=>{
+    b.addEventListener("click", () => {
       pending.selected = idx;
-      [...list.querySelectorAll("button")].forEach(x=>{
+      [...list.querySelectorAll("button")].forEach(x => {
         x.classList.remove("armed");
         x.dataset.color = "";
         x.style.color = "";
@@ -1190,17 +1189,17 @@ function startPilierMode(){
   validate.textContent = "Valider";
   validate.disabled = true;
 
-  list.addEventListener("click", ()=>{
+  list.addEventListener("click", () => {
     validate.disabled = (pending.selected === null);
     validate.classList.toggle("disabled", validate.disabled);
-    if(!validate.disabled){
+    if (!validate.disabled) {
       validate.classList.add("armed");
       validate.dataset.color = "white";
     }
   });
 
-  validate.addEventListener("click", ()=>{
-    if(pending.selected === null) return;
+  validate.addEventListener("click", () => {
+    if (pending.selected === null) return;
     pilierActive = { forPlayerIndex: joueurIndex, otherIndex: pending.selected };
     showPopup(`Carte <span class="pink">Pilier de comptoir</span> : si tu perds au prochain guess, <span class="pink">${escapeHtml(joueurs[pending.selected])}</span> boit avec toi.`);
     backToDefaultUI();
@@ -1212,7 +1211,7 @@ function startPilierMode(){
 }
 
 /* ---- Analyse: choisir plus/moins sur SOMME des 2 prochaines cartes vs carte actuelle ---- */
-function startAnalyseMode(){
+function startAnalyseMode() {
   uiMode = "analyse";
   pending = { pm: "plus" };
   switchToPanel();
@@ -1232,17 +1231,17 @@ function startAnalyseMode(){
   bMoins.className = "btn-action";
   bMoins.textContent = "Moins";
 
-  function refresh(){
-    if(pending.pm === "plus"){
-      bPlus.classList.add("armed"); bPlus.dataset.color="white";
-      bMoins.classList.remove("armed"); bMoins.dataset.color="";
-    }else{
-      bMoins.classList.add("armed"); bMoins.dataset.color="white";
-      bPlus.classList.remove("armed"); bPlus.dataset.color="";
+  function refresh() {
+    if (pending.pm === "plus") {
+      bPlus.classList.add("armed"); bPlus.dataset.color = "white";
+      bMoins.classList.remove("armed"); bMoins.dataset.color = "";
+    } else {
+      bMoins.classList.add("armed"); bMoins.dataset.color = "white";
+      bPlus.classList.remove("armed"); bPlus.dataset.color = "";
     }
   }
-  bPlus.addEventListener("click", ()=>{ pending.pm = "plus"; refresh(); });
-  bMoins.addEventListener("click", ()=>{ pending.pm = "moins"; refresh(); });
+  bPlus.addEventListener("click", () => { pending.pm = "plus"; refresh(); });
+  bMoins.addEventListener("click", () => { pending.pm = "moins"; refresh(); });
 
   row.appendChild(bPlus);
   row.appendChild(bMoins);
@@ -1252,13 +1251,13 @@ function startAnalyseMode(){
   validate.dataset.color = "white";
   validate.textContent = "Valider";
 
-  validate.addEventListener("click", async ()=>{
+  validate.addEventListener("click", async () => {
     const top = pile[0];
     const c1 = pile[1];
     const c2 = pile[2];
 
     // besoin de 2 chiffres après
-    if(!top || top.type !== "chiffre" || !c1 || !c2 || c1.type !== "chiffre" || c2.type !== "chiffre"){
+    if (!top || top.type !== "chiffre" || !c1 || !c2 || c1.type !== "chiffre" || c2.type !== "chiffre") {
       showPopup(`Analyse impossible : il faut que les <span class="pink">2 prochaines</span> soient des cartes chiffres.`);
       backToDefaultUI();
       return;
@@ -1266,20 +1265,20 @@ function startAnalyseMode(){
 
     const sum = c1.valeur + c2.valeur;
     let win = false;
-    if(pending.pm === "plus") win = sum > top.valeur;
-    if(pending.pm === "moins") win = sum < top.valeur;
+    if (pending.pm === "plus") win = sum > top.valeur;
+    if (pending.pm === "moins") win = sum < top.valeur;
 
-    if(mythoActive) win = !win;
+    if (mythoActive) win = !win;
 
     // on montre 2 cartes comme purple: c1 visible 3s puis c2 reste
-    if(win){
+    if (win) {
       onWin(2);
       await advanceOneCard();   // révèle c1
       await sleep(3000);
       await advanceOneCard();   // révèle c2
-    }else{
+    } else {
       // perte
-      await onLoseFlow({reason:"analyse"});
+      await onLoseFlow({ reason: "analyse" });
       await advanceOneCard();   // révèle c1
       await sleep(3000);
       await advanceOneCard();   // révèle c2
@@ -1297,8 +1296,8 @@ function startAnalyseMode(){
 /* =========================
    “C’EST CADEAU” : prochain joueur choisit ton guess
 ========================= */
-async function startCadeauChooser(){
-  if(!cadeauActive) return;
+async function startCadeauChooser() {
+  if (!cadeauActive) return;
 
   uiMode = "cadeau_choose";
   pending = { chosen: null };
@@ -1316,47 +1315,47 @@ async function startCadeauChooser(){
   grid.style.padding = "0";
 
   const actions = [
-    ["Plus","plus"],
-    ["Moins","moins"],
-    ["Orange","orange"],
-    ["Vert","vert"],
-    ["Purple","purple"],
-    ["Valider","valider"]
+    ["Plus", "plus"],
+    ["Moins", "moins"],
+    ["Orange", "orange"],
+    ["Vert", "vert"],
+    ["Purple", "purple"],
+    ["Valider", "valider"]
   ];
 
   const btnMap = new Map();
 
-  actions.forEach(([label, act])=>{
+  actions.forEach(([label, act]) => {
     const b = document.createElement("button");
     b.className = "btn-action";
     b.textContent = label;
 
-    if(act === "orange") b.style.color = "var(--orange)";
-    if(act === "vert") b.style.color = "var(--vert)";
-    if(act === "purple") b.style.color = "var(--rose)";
-    if(act === "valider"){
+    if (act === "orange") b.style.color = "var(--orange)";
+    if (act === "vert") b.style.color = "var(--vert)";
+    if (act === "purple") b.style.color = "var(--rose)";
+    if (act === "valider") {
       b.classList.add("disabled");
       b.disabled = true;
       b.textContent = "Valider";
     }
 
-    b.addEventListener("click", ()=>{
-      if(act === "valider") return;
+    b.addEventListener("click", () => {
+      if (act === "valider") return;
       pending.chosen = act;
 
       // highlight
-      [...grid.querySelectorAll("button")].forEach(x=>{
-        if(x === b) return;
-        if(x.textContent === "Valider") return;
+      [...grid.querySelectorAll("button")].forEach(x => {
+        if (x === b) return;
+        if (x.textContent === "Valider") return;
         x.classList.remove("armed");
         x.dataset.color = "";
-        x.style.color = (x.textContent==="Orange") ? "var(--orange)" :
-                        (x.textContent==="Vert") ? "var(--vert)" :
-                        (x.textContent==="Purple") ? "var(--rose)" : "";
+        x.style.color = (x.textContent === "Orange") ? "var(--orange)" :
+          (x.textContent === "Vert") ? "var(--vert)" :
+            (x.textContent === "Purple") ? "var(--rose)" : "";
       });
 
       b.classList.add("armed");
-      b.dataset.color = (act==="orange")?"orange":(act==="vert")?"vert":(act==="purple")?"purple":"white";
+      b.dataset.color = (act === "orange") ? "orange" : (act === "vert") ? "vert" : (act === "purple") ? "purple" : "white";
       b.style.color = "#000";
 
       const v = btnMap.get("valider");
@@ -1370,9 +1369,9 @@ async function startCadeauChooser(){
     grid.appendChild(b);
   });
 
-  btnMap.get("valider").addEventListener("click", async ()=>{
+  btnMap.get("valider").addEventListener("click", async () => {
     const chosen = pending.chosen;
-    if(!chosen) return;
+    if (!chosen) return;
 
     // Résoudre comme un guess normal, MAIS si perdu => c’est le joueur courant qui boit (pas le chooser)
     // Pour simplifier: on force une résolution directe via fonctions, mais en cas de perte on attribue au joueur courant (déjà le cas).
@@ -1381,9 +1380,9 @@ async function startCadeauChooser(){
     backToDefaultUI();
 
     // On lance le guess choisi
-    if(chosen === "purple") await resolvePurple();
-    else if(chosen === "orange" || chosen === "vert") await resolveColorGuess(chosen);
-    else if(chosen === "plus" || chosen === "moins") await resolvePlusMoins(chosen);
+    if (chosen === "purple") await resolvePurple();
+    else if (chosen === "orange" || chosen === "vert") await resolveColorGuess(chosen);
+    else if (chosen === "plus" || chosen === "moins") await resolvePlusMoins(chosen);
   });
 
   wrap.appendChild(grid);
@@ -1395,14 +1394,14 @@ async function startCadeauChooser(){
    - si réussite : +2 et on continue
    - si échec : boit double (compteur *2, puis reset)
 ========================= */
-async function petiteSoeurRescueFlow(){
+async function petiteSoeurRescueFlow() {
   // proposer un purple, si impossible => perte normale
   const c1 = pile[1];
   const c2 = pile[2];
   const purpleOK = c1 && c2 && c1.type === "chiffre" && c2.type === "chiffre";
 
-  if(!purpleOK){
-    await onLoseFlow({reason:"petitesoeur"});
+  if (!purpleOK) {
+    await onLoseFlow({ reason: "petitesoeur" });
     endTurnToNextPlayer();
     return;
   }
@@ -1413,17 +1412,17 @@ async function petiteSoeurRescueFlow(){
   // tenter purple
   const diff = (c1.couleur !== c2.couleur);
   let win = diff;
-  if(mythoActive) win = !win;
+  if (mythoActive) win = !win;
 
-  if(win){
+  if (win) {
     onWin(2);
     await advanceOneCard();
     await sleep(3000);
     await advanceOneCard();
-  }else{
+  } else {
     // boit double
     const amountBase = compteur;
-    const amount = (doubleDoseActive ? amountBase*2 : amountBase) * 2;
+    const amount = (doubleDoseActive ? amountBase * 2 : amountBase) * 2;
 
     const name = currentPlayerName();
     showPopup(`<span class="pink">${escapeHtml(name)}</span> boit <span class="pink">${amount}</span> gorgées (double). Plastiquement vôtre !`);
@@ -1448,21 +1447,21 @@ async function petiteSoeurRescueFlow(){
    - Si la carte du dessus est spéciale ou règle, on autorise “continuer” en cliquant
    - Sinon: on ne fait rien (le joueur doit utiliser les boutons)
 ========================= */
-pileEl.addEventListener("click", async ()=>{
-  if(animating) return;
+pileEl.addEventListener("click", async () => {
+  if (animating) return;
   const top = pile[0];
-  if(!top) return;
+  if (!top) return;
 
-  if(uiMode !== "default") return;
+  if (uiMode !== "default") return;
 
-   if(top.type === "speciale" || top.type === "regle"){
-   // Le joueur clique pour "continuer" : on passe à la carte suivante
-   await advanceOneCard();
+  if (top.type === "speciale" || top.type === "regle") {
+    // Le joueur clique pour "continuer" : on passe à la carte suivante
+    await advanceOneCard();
 
-   // Si la carte spéciale impose une fin de tour (ex: tournée générale / balle neuve),
-   // onCardRevealed() s’en charge déjà.
-   return;
- }
+    // Si la carte spéciale impose une fin de tour (ex: tournée générale / balle neuve),
+    // onCardRevealed() s’en charge déjà.
+    return;
+  }
 
   // si carte chiffre: pas d’action au clic (le joueur doit guess via boutons)
 });
